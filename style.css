@@ -1,0 +1,68 @@
+/* 생성: 2026-10-08 13:33 KST */
+:root {
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #1f2430;
+  --muted: #5d6475;
+  --line: #d9dde7;
+  --primary: #2f5bd3;
+  --correct: #1f8a4c;
+  --correct-bg: #e3f5ea;
+  --wrong: #c62f3a;
+  --wrong-bg: #fbe5e7;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, "Malgun Gothic", sans-serif;
+  line-height: 1.5;
+}
+
+.app { max-width: 640px; margin: 0 auto; padding: 16px; }
+.screen { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px 16px; }
+h1, h2 { margin: 0 0 12px; }
+
+button {
+  font: inherit;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+}
+button:disabled { cursor: default; }
+button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+.notice { color: var(--muted); }
+.error { color: var(--wrong); font-weight: 600; }
+
+.category-list, .choices { display: grid; gap: 8px; }
+
+.quiz-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--muted); margin-bottom: 12px; }
+.badge { padding: 2px 8px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+.question { font-size: 1.15rem; font-weight: 600; overflow-wrap: anywhere; }
+
+.choice { display: flex; justify-content: space-between; gap: 8px; text-align: left; overflow-wrap: anywhere; }
+.choice.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); }
+.choice.wrong { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong); }
+.mark { font-weight: 700; white-space: nowrap; }
+
+.feedback { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+.verdict { font-weight: 700; margin: 0 0 4px; }
+.verdict.correct { color: var(--correct); }
+.verdict.wrong { color: var(--wrong); }
+.explanation, .source { margin: 4px 0; overflow-wrap: anywhere; }
+
+.final-score { font-size: 2rem; font-weight: 700; margin: 8px 0; }
+.result-list { padding-left: 20px; }
+.result-list li { margin: 6px 0; overflow-wrap: anywhere; }
+.result-list li.correct::marker { color: var(--correct); }
+.result-list li.wrong::marker { color: var(--wrong); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }

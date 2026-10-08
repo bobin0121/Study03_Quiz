@@ -1,0 +1,50 @@
+<!doctype html>
+<!-- 생성: 2026-10-08 13:33 KST -->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>상식 퀴즈</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <section id="screen-start" class="screen">
+      <h1>상식 퀴즈</h1>
+      <p class="notice" id="start-notice">연습 모드 (순위표에 기록되지 않음)</p>
+      <p class="error" id="data-error" hidden>문항 데이터 오류</p>
+      <div class="category-list" id="category-list"></div>
+    </section>
+
+    <section id="screen-quiz" class="screen" hidden>
+      <header class="quiz-head">
+        <span class="badge" id="quiz-category"></span>
+        <span class="badge" id="quiz-mode"></span>
+        <span id="quiz-progress"></span>
+        <span id="quiz-score"></span>
+      </header>
+      <p class="question" id="quiz-question"></p>
+      <div class="choices" id="quiz-choices"></div>
+      <div class="feedback" id="quiz-feedback" hidden>
+        <p class="verdict" id="feedback-verdict"></p>
+        <p class="explanation" id="feedback-explanation"></p>
+        <p class="source">출처: <a id="feedback-source" target="_blank" rel="noopener noreferrer"></a></p>
+        <button type="button" class="primary" id="next-button">다음</button>
+      </div>
+    </section>
+
+    <section id="screen-result" class="screen" hidden>
+      <h2 id="result-title">결과</h2>
+      <p class="final-score" id="result-score"></p>
+      <p class="notice" id="result-notice">순위표에 기록되지 않음</p>
+      <ol class="result-list" id="result-list"></ol>
+      <div class="actions">
+        <button type="button" class="primary" id="again-button">같은 모드 다시</button>
+        <button type="button" id="home-button">처음으로</button>
+      </div>
+    </section>
+  </main>
+  <script src="questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
