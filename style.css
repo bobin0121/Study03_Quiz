@@ -73,3 +73,4 @@ button.primary { background: var(--primary); border-color: var(--primary); color
 .hint-row { margin: 0 0 8px; }
 .choice.removed { opacity: 0.35; text-decoration: line-through; }
 .student { margin: 0 0 8px; font-weight: 600; color: var(--muted); }
+#quiz-timer.urgent { color: var(--wrong); font-weight: 700; }

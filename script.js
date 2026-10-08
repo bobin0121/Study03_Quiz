@@ -64,6 +64,12 @@ function scoreAnswer(isCorrect, usedHint) {
   return usedHint ? 0.5 : 1;
 }
 
+// 결과 목록에서 문항마다 붙이는 표시
+function resultLabel(result) {
+  if (result.isCorrect) return result.usedHint ? "정답 (힌트 0.5점)" : "정답";
+  return result.choiceIndex === null ? "시간 초과" : "오답";
+}
+
 function pickHintRemovals(question) {
   const wrong = [0, 1, 2, 3].filter((i) => i !== question.answer);
   return shuffle(wrong).slice(0, 2);
@@ -161,6 +167,7 @@ function renderQuestion() {
   if (timed) startTimer();
   $("hint-button").hidden = state.mode !== "hint" || state.isRetry;
   $("hint-button").disabled = false;
+  $("hint-button").textContent = "힌트 (오답 2개 지우기)";
 }
 
 // choiceIndex가 null이면 스피드 모드의 시간 초과다.
@@ -170,7 +177,7 @@ function handleAnswer(choiceIndex) {
   const item = state.round[state.index];
   const isCorrect = choiceIndex === item.answer;
   if (!state.isRetry) state.score += scoreAnswer(isCorrect, state.usedHint);
-  state.results.push({ item, choiceIndex, isCorrect });
+  state.results.push({ item, choiceIndex, isCorrect, usedHint: state.usedHint });
 
   $("quiz-choices").querySelectorAll("button").forEach((button, i) => {
     button.disabled = true;
@@ -219,14 +226,14 @@ function renderResult() {
   for (const r of state.results) {
     const li = document.createElement("li");
     li.className = r.isCorrect ? "correct" : "wrong";
-    li.textContent = `[${r.isCorrect ? "정답" : "오답"}] ${r.item.original.question} / 정답: ${r.item.choices[r.item.answer]}`;
+    li.textContent = `[${resultLabel(r)}] ${r.item.original.question} / 정답: ${r.item.choices[r.item.answer]}`;
     list.appendChild(li);
   }
 }
 
 function chooseCategory(category) {
   state.category = category;
-  $("mode-title").textContent = category;
+  $("mode-title").textContent = `${category}, 모드를 고르세요`;
   showScreen("screen-mode");
 }
 
@@ -252,6 +259,7 @@ function stopTimer() {
 
 function renderTimer() {
   $("quiz-timer").textContent = `남은 시간 ${state.secondsLeft}초`;
+  $("quiz-timer").classList.toggle("urgent", state.secondsLeft <= 5);
 }
 
 function handleTimeout() {
@@ -269,6 +277,7 @@ function useHint() {
     buttons[i].classList.add("removed");
   }
   $("hint-button").disabled = true;
+  $("hint-button").textContent = "힌트 사용함";
 }
 
 // 틀린 문항만 순서와 보기를 다시 섞어 낸다. 다시 풀기는 채점하지 않으므로 state.score는 그대로 둔다.
