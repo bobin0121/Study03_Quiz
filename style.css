@@ -66,3 +66,7 @@ button.primary { background: var(--primary); border-color: var(--primary); color
 .result-list li.correct::marker { color: var(--correct); }
 .result-list li.wrong::marker { color: var(--wrong); }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+
+.mode-list { display: grid; gap: 8px; }
+.mode { display: grid; gap: 2px; text-align: left; }
+.mode .notice { font-size: 0.9rem; }

@@ -97,10 +97,14 @@ function init() {
     button.type = "button";
     button.className = "category";
     button.textContent = category;
-    button.addEventListener("click", () => startRound(category, "practice"));
+    button.addEventListener("click", () => chooseCategory(category));
     list.appendChild(button);
   }
   $("next-button").addEventListener("click", nextQuestion);
+  for (const button of document.querySelectorAll(".mode")) {
+    button.addEventListener("click", () => startRound(state.category, button.dataset.mode));
+  }
+  $("back-button").addEventListener("click", () => showScreen("screen-start"));
   $("again-button").addEventListener("click", () => startRound(state.category, state.mode));
   $("home-button").addEventListener("click", () => showScreen("screen-start"));
 
@@ -201,6 +205,12 @@ function renderResult() {
     li.textContent = `[${r.isCorrect ? "정답" : "오답"}] ${r.item.original.question} / 정답: ${r.item.choices[r.item.answer]}`;
     list.appendChild(li);
   }
+}
+
+function chooseCategory(category) {
+  state.category = category;
+  $("mode-title").textContent = category;
+  showScreen("screen-mode");
 }
 
 // ===== 4. 자체 점검 =====
