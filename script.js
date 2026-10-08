@@ -84,6 +84,7 @@ const MODE_LABEL = { practice: "연습", speed: "스피드", hint: "힌트" };
 const $ = (id) => document.getElementById(id);
 
 function showScreen(id) {
+  stopTimer();
   for (const section of document.querySelectorAll(".screen")) {
     section.hidden = section.id !== id;
   }
@@ -148,10 +149,14 @@ function renderQuestion() {
     box.appendChild(button);
   });
   $("quiz-feedback").hidden = true;
+  const timed = state.mode === "speed";
+  $("quiz-timer").hidden = !timed;
+  if (timed) startTimer();
 }
 
 // choiceIndex가 null이면 스피드 모드의 시간 초과다.
 function handleAnswer(choiceIndex) {
+  stopTimer();
   const item = state.round[state.index];
   const isCorrect = choiceIndex === item.answer;
   if (!state.isRetry) state.score += scoreAnswer(isCorrect, state.usedHint);
@@ -211,6 +216,35 @@ function chooseCategory(category) {
   state.category = category;
   $("mode-title").textContent = category;
   showScreen("screen-mode");
+}
+
+const SPEED_SECONDS = 15;
+
+function startTimer() {
+  stopTimer();
+  state.secondsLeft = SPEED_SECONDS;
+  renderTimer();
+  state.timerId = setInterval(() => {
+    state.secondsLeft -= 1;
+    renderTimer();
+    if (state.secondsLeft <= 0) handleTimeout();
+  }, 1000);
+}
+
+function stopTimer() {
+  if (state.timerId !== null) {
+    clearInterval(state.timerId);
+    state.timerId = null;
+  }
+}
+
+function renderTimer() {
+  $("quiz-timer").textContent = `남은 시간 ${state.secondsLeft}초`;
+}
+
+function handleTimeout() {
+  stopTimer();
+  handleAnswer(null);
 }
 
 // ===== 4. 자체 점검 =====
