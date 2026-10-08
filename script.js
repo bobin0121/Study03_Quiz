@@ -167,6 +167,11 @@ check("buildRound: 보기 4개는 원래 보기와 같은 집합이다", () =>
     (item) => item.choices.slice().sort().join("|") === item.original.choices.slice().sort().join("|")
   ));
 check("scoreAnswer: 맞히면 1점, 틀리면 0점", () => scoreAnswer(true, false) === 1 && scoreAnswer(false, false) === 0);
+check("QUESTIONS: 실제 문항 데이터가 validateQuestions를 통과한다", () => {
+  const problems = validateQuestions(QUESTIONS);
+  problems.forEach((p) => console.error(`  ${p}`));
+  return problems.length === 0;
+});
 
 // ===== 5. 시작 =====
 if (typeof document === "undefined") {
