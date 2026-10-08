@@ -5,6 +5,15 @@
 const CATEGORIES = ["한국사", "세계지리", "과학", "예술과 문화"];
 const QUESTIONS_PER_CATEGORY = 10;
 
+function shuffle(array) {
+  const copy = array.slice();
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 // ===== 2. 상태 =====
 
 // ===== 3. 화면 조작 =====
@@ -51,6 +60,13 @@ function runSelfTests() {
 }
 
 // (자체 점검 항목은 이 아래에 check(...)로 추가한다.)
+check("shuffle: 길이를 유지한다", () => shuffle([1, 2, 3, 4, 5]).length === 5);
+check("shuffle: 원소를 그대로 가진다", () => shuffle([1, 2, 3, 4, 5]).slice().sort().join(",") === "1,2,3,4,5");
+check("shuffle: 원본을 바꾸지 않는다", () => {
+  const original = [1, 2, 3, 4, 5];
+  shuffle(original);
+  return original.join(",") === "1,2,3,4,5";
+});
 
 // ===== 5. 시작 =====
 if (typeof document === "undefined") {
