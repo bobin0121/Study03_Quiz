@@ -65,6 +65,20 @@ function scoreAnswer(isCorrect, usedHint) {
 }
 
 // ===== 2. 상태 =====
+const state = {
+  category: null,
+  mode: "practice",
+  round: [],
+  index: 0,
+  score: 0,
+  results: [],
+  usedHint: false,
+  timerId: null,
+  secondsLeft: 0,
+  isRetry: false,
+};
+
+const MODE_LABEL = { practice: "연습", speed: "스피드", hint: "힌트" };
 
 // ===== 3. 화면 조작 =====
 const $ = (id) => document.getElementById(id);
@@ -77,7 +91,92 @@ function showScreen(id) {
 }
 
 function init() {
+  const list = $("category-list");
+  for (const category of CATEGORIES) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "category";
+    button.textContent = category;
+    button.addEventListener("click", () => startRound(category, "practice"));
+    list.appendChild(button);
+  }
+  $("next-button").addEventListener("click", nextQuestion);
   showScreen("screen-start");
+}
+
+function startRound(category, mode) {
+  state.category = category;
+  state.mode = mode;
+  state.isRetry = false;
+  state.round = buildRound(QUESTIONS, category);
+  state.index = 0;
+  state.score = 0;
+  state.results = [];
+  showScreen("screen-quiz");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const item = state.round[state.index];
+  state.usedHint = false;
+  $("quiz-category").textContent = state.category;
+  $("quiz-mode").textContent = state.isRetry ? "다시 풀기" : MODE_LABEL[state.mode];
+  $("quiz-progress").textContent = `${state.index + 1} / ${state.round.length}`;
+  $("quiz-score").textContent = state.isRetry ? "" : `점수 ${state.score}`;
+  $("quiz-question").textContent = item.original.question;
+  const box = $("quiz-choices");
+  box.textContent = "";
+  item.choices.forEach((text, i) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "choice";
+    button.textContent = text;
+    button.addEventListener("click", () => handleAnswer(i));
+    box.appendChild(button);
+  });
+  $("quiz-feedback").hidden = true;
+}
+
+// choiceIndex가 null이면 스피드 모드의 시간 초과다.
+function handleAnswer(choiceIndex) {
+  const item = state.round[state.index];
+  const isCorrect = choiceIndex === item.answer;
+  if (!state.isRetry) state.score += scoreAnswer(isCorrect, state.usedHint);
+  state.results.push({ item, choiceIndex, isCorrect });
+
+  $("quiz-choices").querySelectorAll("button").forEach((button, i) => {
+    button.disabled = true;
+    if (i === item.answer) markChoice(button, "correct", "정답");
+    else if (i === choiceIndex) markChoice(button, "wrong", "오답");
+  });
+  if (!state.isRetry) $("quiz-score").textContent = `점수 ${state.score}`;
+
+  const verdict = $("feedback-verdict");
+  verdict.textContent = isCorrect ? "정답!" : choiceIndex === null ? "시간 초과" : "오답";
+  verdict.className = `verdict ${isCorrect ? "correct" : "wrong"}`;
+  $("feedback-explanation").textContent = item.original.explanation;
+  const link = $("feedback-source");
+  link.textContent = item.original.source.name;
+  link.href = item.original.source.url;
+  $("next-button").textContent = state.index === state.round.length - 1 ? "결과 보기" : "다음";
+  $("quiz-feedback").hidden = false;
+}
+
+function markChoice(button, kind, label) {
+  button.classList.add(kind);
+  const mark = document.createElement("span");
+  mark.className = "mark";
+  mark.textContent = label;
+  button.appendChild(mark);
+}
+
+function nextQuestion() {
+  state.index += 1;
+  if (state.index >= state.round.length) {
+    renderResult();
+    return;
+  }
+  renderQuestion();
 }
 
 // ===== 4. 자체 점검 =====
