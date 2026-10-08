@@ -64,6 +64,11 @@ function scoreAnswer(isCorrect, usedHint) {
   return usedHint ? 0.5 : 1;
 }
 
+function pickHintRemovals(question) {
+  const wrong = [0, 1, 2, 3].filter((i) => i !== question.answer);
+  return shuffle(wrong).slice(0, 2);
+}
+
 // ===== 2. 상태 =====
 const state = {
   category: null,
@@ -102,6 +107,7 @@ function init() {
     list.appendChild(button);
   }
   $("next-button").addEventListener("click", nextQuestion);
+  $("hint-button").addEventListener("click", useHint);
   for (const button of document.querySelectorAll(".mode")) {
     button.addEventListener("click", () => startRound(state.category, button.dataset.mode));
   }
@@ -152,11 +158,14 @@ function renderQuestion() {
   const timed = state.mode === "speed";
   $("quiz-timer").hidden = !timed;
   if (timed) startTimer();
+  $("hint-button").hidden = state.mode !== "hint" || state.isRetry;
+  $("hint-button").disabled = false;
 }
 
 // choiceIndex가 null이면 스피드 모드의 시간 초과다.
 function handleAnswer(choiceIndex) {
   stopTimer();
+  $("hint-button").disabled = true;
   const item = state.round[state.index];
   const isCorrect = choiceIndex === item.answer;
   if (!state.isRetry) state.score += scoreAnswer(isCorrect, state.usedHint);
@@ -245,6 +254,18 @@ function renderTimer() {
 function handleTimeout() {
   stopTimer();
   handleAnswer(null);
+}
+
+function useHint() {
+  if (state.usedHint) return;
+  state.usedHint = true;
+  const item = state.round[state.index];
+  const buttons = $("quiz-choices").querySelectorAll("button");
+  for (const i of pickHintRemovals(item)) {
+    buttons[i].disabled = true;
+    buttons[i].classList.add("removed");
+  }
+  $("hint-button").disabled = true;
 }
 
 // ===== 4. 자체 점검 =====
@@ -338,6 +359,19 @@ check("QUESTIONS: 실제 문항 데이터가 validateQuestions를 통과한다",
   const problems = validateQuestions(QUESTIONS);
   problems.forEach((p) => console.error(`  ${p}`));
   return problems.length === 0;
+});
+check("scoreAnswer: 힌트를 쓰고 맞히면 0.5점, 틀리면 0점", () => scoreAnswer(true, true) === 0.5 && scoreAnswer(false, true) === 0);
+check("pickHintRemovals: 서로 다른 보기 번호 2개를 고른다", () => {
+  const picked = pickHintRemovals({ choices: ["가", "나", "다", "라"], answer: 2 });
+  return picked.length === 2 && picked[0] !== picked[1] && picked.every((i) => i >= 0 && i <= 3);
+});
+check("pickHintRemovals: 정답은 고르지 않는다", () => {
+  for (let answer = 0; answer < 4; answer++) {
+    for (let n = 0; n < 50; n++) {
+      if (pickHintRemovals({ choices: ["가", "나", "다", "라"], answer }).includes(answer)) return false;
+    }
+  }
+  return true;
 });
 
 // ===== 5. 시작 =====

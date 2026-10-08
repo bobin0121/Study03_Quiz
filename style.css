@@ -70,3 +70,5 @@ button.primary { background: var(--primary); border-color: var(--primary); color
 .mode-list { display: grid; gap: 8px; }
 .mode { display: grid; gap: 2px; text-align: left; }
 .mode .notice { font-size: 0.9rem; }
+.hint-row { margin: 0 0 8px; }
+.choice.removed { opacity: 0.35; text-decoration: line-through; }
