@@ -72,3 +72,4 @@ button.primary { background: var(--primary); border-color: var(--primary); color
 .mode .notice { font-size: 0.9rem; }
 .hint-row { margin: 0 0 8px; }
 .choice.removed { opacity: 0.35; text-decoration: line-through; }
+.student { margin: 0 0 8px; font-weight: 600; color: var(--muted); }
