@@ -48,6 +48,22 @@ function validateQuestions(questions) {
   return problems;
 }
 
+function buildRound(questions, category) {
+  return shuffle(questions.filter((q) => q.category === category)).map((q) => {
+    const order = shuffle([0, 1, 2, 3]);
+    return {
+      original: q,
+      choices: order.map((i) => q.choices[i]),
+      answer: order.indexOf(q.answer),
+    };
+  });
+}
+
+function scoreAnswer(isCorrect, usedHint) {
+  if (!isCorrect) return 0;
+  return usedHint ? 0.5 : 1;
+}
+
 // ===== 2. 상태 =====
 
 // ===== 3. 화면 조작 =====
@@ -138,6 +154,19 @@ check("validateQuestions: 출처 URL이 https가 아니면 잡는다", () => {
   list[0].source = { name: "출처", url: "http://example.com" };
   return validateQuestions(list).length > 0;
 });
+check("buildRound: 해당 카테고리 10문항만 낸다", () => {
+  const round = buildRound(makeValidQuestions(), "과학");
+  return round.length === 10 && round.every((item) => item.original.category === "과학");
+});
+check("buildRound: 섞은 뒤에도 answer가 원래 정답을 가리킨다", () =>
+  buildRound(makeValidQuestions(), "한국사").every(
+    (item) => item.choices[item.answer] === item.original.choices[item.original.answer]
+  ));
+check("buildRound: 보기 4개는 원래 보기와 같은 집합이다", () =>
+  buildRound(makeValidQuestions(), "세계지리").every(
+    (item) => item.choices.slice().sort().join("|") === item.original.choices.slice().sort().join("|")
+  ));
+check("scoreAnswer: 맞히면 1점, 틀리면 0점", () => scoreAnswer(true, false) === 1 && scoreAnswer(false, false) === 0);
 
 // ===== 5. 시작 =====
 if (typeof document === "undefined") {
