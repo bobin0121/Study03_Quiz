@@ -112,6 +112,7 @@ function init() {
     button.addEventListener("click", () => startRound(state.category, button.dataset.mode));
   }
   $("back-button").addEventListener("click", () => showScreen("screen-start"));
+  $("retry-button").addEventListener("click", startRetry);
   $("again-button").addEventListener("click", () => startRound(state.category, state.mode));
   $("home-button").addEventListener("click", () => showScreen("screen-start"));
 
@@ -208,9 +209,11 @@ function nextQuestion() {
 
 function renderResult() {
   showScreen("screen-result");
-  $("result-title").textContent = "결과";
+  $("result-title").textContent = state.isRetry ? "다시 풀기 결과" : "결과";
+  $("result-score").hidden = state.isRetry;
   $("result-score").textContent = `${state.score} / ${state.round.length}`;
   $("result-notice").hidden = state.mode !== "practice";
+  $("retry-button").hidden = state.mode !== "practice" || state.results.every((r) => r.isCorrect);
   const list = $("result-list");
   list.textContent = "";
   for (const r of state.results) {
@@ -266,6 +269,17 @@ function useHint() {
     buttons[i].classList.add("removed");
   }
   $("hint-button").disabled = true;
+}
+
+// 틀린 문항만 순서와 보기를 다시 섞어 낸다. 다시 풀기는 채점하지 않으므로 state.score는 그대로 둔다.
+function startRetry() {
+  const wrong = state.results.filter((r) => !r.isCorrect).map((r) => r.item.original);
+  state.isRetry = true;
+  state.round = buildRound(wrong, state.category);
+  state.index = 0;
+  state.results = [];
+  showScreen("screen-quiz");
+  renderQuestion();
 }
 
 // ===== 4. 자체 점검 =====
