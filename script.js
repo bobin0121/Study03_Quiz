@@ -101,6 +101,15 @@ function init() {
     list.appendChild(button);
   }
   $("next-button").addEventListener("click", nextQuestion);
+  $("again-button").addEventListener("click", () => startRound(state.category, state.mode));
+  $("home-button").addEventListener("click", () => showScreen("screen-start"));
+
+  const problems = validateQuestions(QUESTIONS);
+  if (problems.length > 0) {
+    console.error("문항 데이터 오류:", problems);
+    $("data-error").hidden = false;
+    for (const button of list.querySelectorAll("button")) button.disabled = true;
+  }
   showScreen("screen-start");
 }
 
@@ -177,6 +186,21 @@ function nextQuestion() {
     return;
   }
   renderQuestion();
+}
+
+function renderResult() {
+  showScreen("screen-result");
+  $("result-title").textContent = "결과";
+  $("result-score").textContent = `${state.score} / ${state.round.length}`;
+  $("result-notice").hidden = state.mode !== "practice";
+  const list = $("result-list");
+  list.textContent = "";
+  for (const r of state.results) {
+    const li = document.createElement("li");
+    li.className = r.isCorrect ? "correct" : "wrong";
+    li.textContent = `[${r.isCorrect ? "정답" : "오답"}] ${r.item.original.question} / 정답: ${r.item.choices[r.item.answer]}`;
+    list.appendChild(li);
+  }
 }
 
 // ===== 4. 자체 점검 =====
